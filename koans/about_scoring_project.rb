@@ -28,38 +28,37 @@ require File.expand_path(File.dirname(__FILE__) + '/neo')
 # More scoring examples are given in the tests below:
 #
 # Your goal is to write the score method.
-
-def score(dice)
-  score = 0
-  n = dice.size
-  unless n == 0
-    count = [0, 0, 0, 0, 0, 0]
-    rem = [0, 0, 0, 0, 0, 0]
-    for j in (0..5) do
-      for i in (0..n) do
-        if dice[i] == j + 1
-          count[j] += 1
-        end
-      rem[j] = count[j] % 3
-      end
-    end
-    for i in (1..5) do
-      if count[i] > 2
-        score += (i + 1) * 100 * (count[i] - rem[i]) / 3.0
-      end
-    end
-    unless count[0] == 0
-      if count[0] > 2
-        score += 1000 * (count[0] - rem[0])/3
-        score += 100 * rem[0]
-      else
-        score += 100 * rem[0]
-      end
-    end
-    unless count[4] == 0
-      score += 50 * rem[4]
+def stack_data_for(dice)
+  count = [0, 0, 0, 0, 0, 0]
+  for j in (0..5) do
+#    for i in (0..dice.size) do
+    dice.each do |item|
+      count[j] += 1 if item == j + 1
     end
   end
+  count
+end
+
+def module_for(number)
+  number % 3
+end
+def score(dice)
+  score = 0
+  return score unless dice.size
+  count = stack_data_for dice
+#    for i in (1..5) do
+  (1..5).each do |i|
+      score += (i + 1) * 100 * (count[i] - module_for(count[i])) / 3.0 if count[i] > 2
+  end
+  unless count[0] == 0
+    if count[0] > 2
+      score += 1000 * (count[0] - module_for(count[0]))/3
+      score += 100 * module_for(count[0])
+    else
+      score += 100 * module_for(count[0])
+    end
+  end
+  score += 50 * module_for(count[4]) unless count[4] == 0
   score
 end
 
